@@ -67,7 +67,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Inteligencia Artificial</string>
+          <string>Kenworth - Sistema experto de ventas</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -147,7 +147,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
