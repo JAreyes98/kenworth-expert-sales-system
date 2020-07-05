@@ -121,6 +121,8 @@ class ControladorMain(QMainWindow, Ui_App):
     def setFooter(self):
         self.setImagen(self.lbLogoUni, 'uni.png')
 
+        self.setImagen(self.lbLogoKenword, 'kenworth.png')
+
         #Tipo de letra y estilos
         self.lbTextoUni.setStyleSheet('color: #003485')
 

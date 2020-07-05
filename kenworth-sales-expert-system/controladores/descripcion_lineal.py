@@ -19,6 +19,8 @@ class Query(QMainWindow, Ui_app):
 
         self.btnGrafica.clicked.connect(self.graficarEvent)
 
+        self.setStyleSheet('QWidget{background-color: #1D2023;}')
+
     def detalle(self):
 
         row = 0

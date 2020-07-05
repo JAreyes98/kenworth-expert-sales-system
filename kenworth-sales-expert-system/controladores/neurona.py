@@ -20,6 +20,7 @@ class MainWindow(QMainWindow, Ui_app):
         QMainWindow.__init__(self)
         Ui_app.__init__(self)
         self.setupUi(self)
+        self.setStyleSheet('QWidget{background-color: #1D2023;}')
 
         # Widguet
         self.canvas = FigureCanvasQTAgg(Figure())

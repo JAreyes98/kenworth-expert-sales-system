@@ -16,6 +16,8 @@ class ControladorFiltroProducto(QtWidgets.QMainWindow, Ui_Form):
         self.cbxproducto.currentIndexChanged.connect(self.filtrar_producto)
         self.btntodos.clicked.connect(self.mostar_all)
 
+        self.setStyleSheet('QWidget{background-color: #1D2023;}')
+
     def mostar_all(self):
 
         row = 0

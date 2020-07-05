@@ -37,6 +37,8 @@ class MLP(QMainWindow, Ui_app):
         self.btnpredecir.clicked.connect(self.predecir)
         self.btnmatriz.clicked.connect(self.matriz)
 
+        self.setStyleSheet('QWidget{background-color: #1D2023;}')
+
     def llenar_cb(self):
 
         separacion = []
