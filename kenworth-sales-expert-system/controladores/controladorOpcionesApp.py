@@ -70,7 +70,7 @@ class ControladorOpcionesApp(QMainWindow, Ui_OpcionesApp):
         regresion = Query()
         regresion.resize(1089,531)
         self.padre.pnCentral.closeAllSubWindows()
-        self.padre.addSubVentana(regresion,0,70,1170,550)
+        self.padre.addSubVentana(regresion,0,70,800,550)
         regresion.show()
 
     def abrirTablaDatos(self):

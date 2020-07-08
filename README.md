@@ -68,6 +68,7 @@
     "Finalmente se crean cursores que insertan y actualizan datos y tablas en la base de datos, dejandola lista para su respectivo funcionamiento." 
 
 #### Manera 2 - Restaurar el backup (que se encuentra en Querys/db_backup)
+    "Para restaurar el backup debe tener una version de SQL Server 2019 o superior ya que este no es compatible con versiones inferiores"
 ##### 1.- Ejecutar el siguiente comando
         ~~~
         RESTORE FILELISTONLY
@@ -78,7 +79,7 @@
         WITH FILE = 1
         RECOVERY;
         ~~~
-#### Manera 3 - Script con todos los datos
+#### Manera 3 - Script con todos los datos (RECOMENDADO, es el metodo mas seguro)
 ##### 1.- Ejecutar el Script llamado Full Query.sql que se encuentra en la carpeta sqlserver
 
 # Cambiar las credenciales y datos del gestor

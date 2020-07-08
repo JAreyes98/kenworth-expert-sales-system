@@ -102,14 +102,7 @@ class Query(QMainWindow, Ui_app):
         b = regr.intercept_ # Intercept
 
         y_p = m*X+b # Predice
-
-        # plt.scatter(y,x, color='blue', linewidth=3)
-        # plt.title('Regresión lineal', fontsize=16)
-        # plt.xlabel(colName1, fontsize=13)
-        # plt.ylabel(colName2, fontsize=13)
-        # plt.xlim(0, 30)
-
-        #Modelo de regresion lineal
+        
         modelo = 'y={0}*x+{1}'.format(m,b)
 
         self.txtmodelo.setText(str(modelo))
@@ -135,9 +128,7 @@ class Query(QMainWindow, Ui_app):
 
         # Datos de entrenamientos
         
-        analisis = ""
-
-        if(corre > 5):
+        if(corre > 0.5):
             analisis = f"""El coeficiente de correlacion de la regresion ejecutada en modo entrenamiento aroja
             un coeficinete de correlacion '{corre}' > 0.5 lo que indica que realizar pronosticos con este 
             modelo arrojaria datos muy acercados a la realidad."""
@@ -145,6 +136,7 @@ class Query(QMainWindow, Ui_app):
             analisis = f"""El coeficiente de correlacion de la regresion ejecutada en modo entrenamiento aroja
             un coeficinete de correlacion '{corre}' < 0.5 lo que indica que realizar pronosticos con este 
             modelo no resultaria muy fieble, por lo que se recomienda utilizar otro modelo."""
+
 
         self.txtAnalisis.setText(analisis)
 
