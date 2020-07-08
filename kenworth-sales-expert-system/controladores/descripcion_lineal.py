@@ -5,7 +5,10 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5 import QtCore
 
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
 from modelos.conexionDB import Conexion
+from modelos.Filter import DataFilter
+import math
 
 Ui_app, QBase = uic.loadUiType('./vistas/form_imagen.ui')
 
@@ -23,48 +26,32 @@ class Query(QMainWindow, Ui_app):
 
     def detalle(self):
 
-        row = 0
+        
         conexion = Conexion()
         cursor = conexion.cursor()
 
-        consulta = """SELECT datepart(week, f.fecha_transacciín), sum(df.cantidad) as sumCan
-        from detalle_factura df inner join producto p 
-        on df.idproducto = p.idproducto
-        inner join factura f on df.idfactura = f.idfactura
-        group by datepart(week, f.fecha_transacciín)
-        order by datepart(week, f.fecha_transacciín) desc;""" 
+        procedimiento = "sp_sales_per_week" 
 
-        # https://www.nosolocodigo.com/como-crear-funciones-en-mysql
-
-        cursor.execute(consulta)
+        cursor.execute("{CALL " + procedimiento +"}")
         filas = cursor.fetchall()
         conexion.cerrarConexion()
 
-        # print(filas)
-        datos = []
         colum1 = []
         colum2 = []
+        colName1 = 'Semana'
+        colName2 = 'Venta'
 
         for data in filas:
+            colum1.append(data[0])
             colum2.append(data[1])
-            
-        contador = 1
-            
-        for data in filas:
-            colum1.append(contador)
-            contador +=1
 
-        datos.append(colum1)
-        datos.append(colum2)
+        df = pd.DataFrame({colName1:colum1, colName2:colum2})
+        df = DataFilter(df, colName1, colName2).filter()
 
-        df = pd.DataFrame({'Semana':datos[0], 'Cantidad':datos[1]})
-
-        semana_describe = df['Semana'].describe()
-
-        self.textdescripcion.setText(str(semana_describe))
+        semana_describe = df[colName2].describe()
 
         # Algoritmos
-
+        row = 0
         import numpy  as np
         # import matplotlib.pyplot as plt
         from sklearn import linear_model
@@ -73,8 +60,8 @@ class Query(QMainWindow, Ui_app):
         regr = linear_model.LinearRegression()
         log = linear_model.LogisticRegression(solver = 'lbfgs')
 
-        x = df['Cantidad'] # Variable dependiente
-        y = df['Semana'] # Variable independiente
+        x = df[colName1] # Variable dependiente
+        y = df[colName2] # Variable independiente
         # A mayor numero de likes, esperariamos un score mas alto
 
         fl = []
@@ -82,25 +69,33 @@ class Query(QMainWindow, Ui_app):
         contador = 0
 
         for a in x:
-            fl.append(float(a))
+            fl.append(a)
 
-        dff = pd.DataFrame({'Flotante':fl})
+        # dff = pd.DataFrame({'Flotante':fl})
             
-        XX = dff['Flotante']
+        # XX = dff['Flotante']
+        XX = df[colName1]
 
-        X = XX[:, np.newaxis] # Le da un formato de arreglo a los datos que estamos mandando
+        X = XX[:, np.newaxis] # Le da un formato de arreglo numpy
+
+        plt.scatter(y,x, color='blue', linewidth=3)
+        plt.title('Regresión lineal', fontsize=16)
+        plt.xlabel('Semana')
+        plt.ylabel('Vemtas')
+        # plt.show()
 
         # Seperar los datos en conjuntos para entrenar y para hacer las pruebas
         from sklearn.model_selection import train_test_split
         # Tamaño de la prueba 0.25, valores desde el 0 a 1, decimales en porcentaje
         # random_state: si fijamos un numero nos va permitir obtener la misma semilla donde va obtenerse los numeros aleatorios
-        X_train, X_test, y_train, y_test = train_test_split(X, y , test_size = 0.5, random_state = 0)
+        X_train, X_test, y_train, y_test = train_test_split(X, y , test_size = 0.1, random_state = 0)
 
         #Predicción o el modelo lineal
         regr.fit(X_train,y_train) # Depende de estas variables
 
         #Coeficiende de regresión lineal
-        self.txtcoeficiente.setText(str(regr.coef_[0]))
+        corre = math.sqrt(regr.score(X,y))
+        self.txtcoeficiente.setText(str(corre))
 
         # Formato como si fuera de la ecuacion de la linea recta, modelo
         m = regr.coef_[0] # Pendiente
@@ -108,11 +103,11 @@ class Query(QMainWindow, Ui_app):
 
         y_p = m*X+b # Predice
 
-        plt.scatter(y,x, color='blue')
-        plt.title('Regresión lineal', fontsize=16)
-        plt.xlabel('Cantidad', fontsize=13)
-        plt.ylabel('Semana', fontsize=13)
-        plt.xlim(0, 30)
+        # plt.scatter(y,x, color='blue', linewidth=3)
+        # plt.title('Regresión lineal', fontsize=16)
+        # plt.xlabel(colName1, fontsize=13)
+        # plt.ylabel(colName2, fontsize=13)
+        # plt.xlim(0, 30)
 
         #Modelo de regresion lineal
         modelo = 'y={0}*x+{1}'.format(m,b)
@@ -120,19 +115,38 @@ class Query(QMainWindow, Ui_app):
         self.txtmodelo.setText(str(modelo))
 
         score_lineal = str(regr.score(X_test,y_test))
-        self.txtscore_lineal.setText(score_lineal)
 
         #nLogaritmica
 
-        log.fit(X_train,y_train) # Entranar el algoritmo
+        # logarithmic function  
+        # def func(x, p1,p2):
+        #     return p1*np.log(x)+p2
 
-        score_logaritmica = log.score(X, y)
+        # popt, pcov = curve_fit(func, X, y,p0=(1.0,10.2))
 
-        self.txtscore_logaritmico.setText(str(score_logaritmica))
+        # log_a= popt[0]
+        # log_b= popt[1]
+        # log_coe = popt[2]
+        # modelo_log = f'{log_a}*ln(x) {log_b}'
+        # self.txtcoeficiente_2.setText(str(log_coe))
+        # self.txtmodelo_2.setText(str(modelo_log))
 
         # Llenando tablas
 
         # Datos de entrenamientos
+        
+        analisis = ""
+
+        if(corre > 5):
+            analisis = f"""El coeficiente de correlacion de la regresion ejecutada en modo entrenamiento aroja
+            un coeficinete de correlacion '{corre}' > 0.5 lo que indica que realizar pronosticos con este 
+            modelo arrojaria datos muy acercados a la realidad."""
+        else:
+            analisis = f"""El coeficiente de correlacion de la regresion ejecutada en modo entrenamiento aroja
+            un coeficinete de correlacion '{corre}' < 0.5 lo que indica que realizar pronosticos con este 
+            modelo no resultaria muy fieble, por lo que se recomienda utilizar otro modelo."""
+
+        self.txtAnalisis.setText(analisis)
 
         fila = 0
         

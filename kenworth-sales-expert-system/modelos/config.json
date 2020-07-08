@@ -1,0 +1,8 @@
+{
+    "sqlserver":{
+        "server":"localhost",
+        "database":"Kenworth",
+        "user":"sa",
+        "password":"mArigrande_98"
+    }
+}
